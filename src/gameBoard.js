@@ -9,7 +9,7 @@ export class Gameboard{
     }
 
     placeShip(length, row, column, isHorizontal = true){
-
+        if(length <= 0 ) throw new Error('Ship length must be greater than 0');
         if(isHorizontal && column + length > this.boardSize) throw new Error('Placement out of bounds');
         if(!isHorizontal && row + length > this.boardSize) throw new Error('Placement out of bounds');
 
@@ -34,12 +34,13 @@ export class Gameboard{
     receiveAttack(row, column){
         if(row >= this.boardSize || column >= this.boardSize)throw new Error('Invalid attack position');
         const attackedCoordinates = `${row}-${column}`;
-        if(this.attacks.has(attackedCoordinates)) return false;
+        if(this.attacks.has(attackedCoordinates)) return 'already-attacked';
+        this.attacks.add(attackedCoordinates);
         if(this.board[row][column] instanceof Ship){
             this.board[row][column].hit();
+            return 'hit';
         }
-        this.attacks.add(attackedCoordinates);
-        return true;
+        return 'miss';
     }
 
     allShipsSunk(){

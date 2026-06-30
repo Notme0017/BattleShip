@@ -1,63 +1,5 @@
-// ship.test.js
-import { Ship } from './ship.js';
-import { Gameboard } from './gameBoard.js';
-
-// describe('Ship', () => {
-
-//   describe('constructor', () => {
-//     test('should create a ship with the correct length', () => {
-//       const ship = new Ship(3);
-//       expect(ship.length).toBe(3);
-//     });
-
-//     test('should default hitsTaken to 0', () => {
-//       const ship = new Ship(3);
-//       expect(ship.hitsTaken).toBe(0);
-//     });
-
-//     test('should allow hitsTaken to be set manually', () => {
-//       const ship = new Ship(3, 2);
-//       expect(ship.hitsTaken).toBe(2);
-//     });
-//   });
-
-//   describe('hit()', () => {
-//     test('should increment hitsTaken by 1', () => {
-//       const ship = new Ship(3);
-//       ship.hit();
-//       expect(ship.hitsTaken).toBe(1);
-//     });
-
-//     test('should increment hitsTaken correctly on multiple hits', () => {
-//       const ship = new Ship(3);
-//       ship.hit();
-//       ship.hit();
-//       expect(ship.hitsTaken).toBe(2);
-//     });
-//   });
-
-//   describe('isSunk()', () => {
-//     test('should return false if ship has not been hit', () => {
-//       const ship = new Ship(3);
-//       expect(ship.isSunk()).toBe(false);
-//     });
-
-//     test('should return false if hitsTaken is less than length', () => {
-//       const ship = new Ship(3);
-//       ship.hit();
-//       expect(ship.isSunk()).toBe(false);
-//     });
-
-//     test('should return true if hitsTaken equals length', () => {
-//       const ship = new Ship(3);
-//       ship.hit();
-//       ship.hit();
-//       ship.hit();
-//       expect(ship.isSunk()).toBe(true);
-//     });
-//   });
-
-// });
+import { Gameboard } from '../src/gameBoard.js';
+import { Ship } from '../src/ship.js';
 
 describe('Gameboard', () => {
 
@@ -123,6 +65,33 @@ describe('Gameboard', () => {
       board.placeShip(3, 0, 0);
       expect(() => board.placeShip(2, 0, 0)).toThrow('Cell already occupied');
     });
+
+    test('shoule not place a ship if length is zero', () =>{
+      expect(() => board.placeShip(-2, 0, 0)).toThrow('Ship length must be greater than 0')
+    });
+
+    test('should place exactly till last cell', () =>{
+      expect(() => board.placeShip(3, 0, 7)).not.toThrow();
+    });
+
+    test('should not place if even one length is out of the cell', () =>{
+      expect(() => board.placeShip(3, 0, 8)).toThrow('Placement out of bounds');
+    });
+
+    test('should place two ships adjacent while both are horizontally placed', () =>{
+      board.placeShip(2, 0, 1);
+      expect(() => board.placeShip(3, 1, 1, false)).not.toThrow();
+    });
+
+    test('should place two ships adjacent one horizontal while other veritcal', () =>{
+      board.placeShip(2, 0, 1);
+      expect(() => board.placeShip(3, 1, 1, true)).not.toThrow();
+    });
+
+    test('should place two ships adjacent while both are veritcally placed', () =>{
+      board.placeShip(2, 0, 1, false);
+      expect(() => board.placeShip(3, 2, 1, false)).not.toThrow();
+    });
   });
 
   describe('receiveAttack()', () => {
@@ -134,13 +103,13 @@ describe('Gameboard', () => {
       expect(() => board.receiveAttack(5, 10)).toThrow('Invalid attack position');
     });
 
-    test('should return true for a valid attack on an empty cell', () => {
-      expect(board.receiveAttack(0, 0)).toBe(true);
+    test('should return "miss" for a valid attack on an empty cell', () => {
+      expect(board.receiveAttack(0, 0)).toBe('miss');
     });
 
-    test('should return true for a valid attack on a ship', () => {
+    test('should return "hit" for a valid attack on a ship', () => {
       board.placeShip(3, 0, 0);
-      expect(board.receiveAttack(0, 0)).toBe(true);
+      expect(board.receiveAttack(0, 0)).toBe('hit');
     });
 
     test('should call hit() on the ship when attacked', () => {
@@ -156,9 +125,9 @@ describe('Gameboard', () => {
       expect(ship.hitsTaken).toBe(0);
     });
 
-    test('should return false when attacking the same cell twice', () => {
+    test('should return "already-attacked" when attacking the same cell twice', () => {
       board.receiveAttack(0, 0);
-      expect(board.receiveAttack(0, 0)).toBe(false);
+      expect(board.receiveAttack(0, 0)).toBe('already-attacked');
     });
 
     test('should not call hit() again when attacking an already-hit ship cell', () => {
@@ -170,8 +139,8 @@ describe('Gameboard', () => {
 
     test('should correctly distinguish between different coordinates on larger boards', () => {
       const largeBoard = new Gameboard(12);
-      expect(largeBoard.receiveAttack(1, 11)).toBe(true);
-      expect(largeBoard.receiveAttack(11, 1)).toBe(true); // should not collide with above
+      expect(largeBoard.receiveAttack(1, 11)).toBe('miss');
+      expect(largeBoard.receiveAttack(11, 1)).toBe('miss');
     });
   });
 
@@ -202,4 +171,3 @@ describe('Gameboard', () => {
   });
 
 });
-
