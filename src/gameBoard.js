@@ -5,6 +5,7 @@ export class Gameboard{
         this.boardSize = boardSize;
         this.board = Array(this.boardSize).fill(null).map(() => Array(boardSize).fill(null));
         this.ships = [];
+        this.attacks = new Set();
     }
 
     placeShip(length, row, column, isHorizontal = true){
@@ -28,5 +29,20 @@ export class Gameboard{
         }
 
         return ship;
+    }
+
+    receiveAttack(row, column){
+        if(row >= this.boardSize || column >= this.boardSize)throw new Error('Invalid attack position');
+        const attackedCoordinates = `${row}-${column}`;
+        if(this.attacks.has(attackedCoordinates)) return false;
+        if(this.board[row][column] instanceof Ship){
+            this.board[row][column].hit();
+        }
+        this.attacks.add(attackedCoordinates);
+        return true;
+    }
+
+    allShipsSunk(){
+        return this.ships.every(ship => ship.isSunk())
     }
 }

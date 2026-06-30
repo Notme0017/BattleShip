@@ -125,4 +125,81 @@ describe('Gameboard', () => {
     });
   });
 
+  describe('receiveAttack()', () => {
+    test('should throw if row is out of bounds', () => {
+      expect(() => board.receiveAttack(10, 5)).toThrow('Invalid attack position');
+    });
+
+    test('should throw if column is out of bounds', () => {
+      expect(() => board.receiveAttack(5, 10)).toThrow('Invalid attack position');
+    });
+
+    test('should return true for a valid attack on an empty cell', () => {
+      expect(board.receiveAttack(0, 0)).toBe(true);
+    });
+
+    test('should return true for a valid attack on a ship', () => {
+      board.placeShip(3, 0, 0);
+      expect(board.receiveAttack(0, 0)).toBe(true);
+    });
+
+    test('should call hit() on the ship when attacked', () => {
+      const ship = board.placeShip(3, 0, 0);
+      board.receiveAttack(0, 0);
+      expect(ship.hitsTaken).toBe(1);
+    });
+
+    test('should not call hit() when attacking an empty cell', () => {
+      board.placeShip(3, 0, 0);
+      const ship = board.ships[0];
+      board.receiveAttack(5, 5); // empty cell, away from ship
+      expect(ship.hitsTaken).toBe(0);
+    });
+
+    test('should return false when attacking the same cell twice', () => {
+      board.receiveAttack(0, 0);
+      expect(board.receiveAttack(0, 0)).toBe(false);
+    });
+
+    test('should not call hit() again when attacking an already-hit ship cell', () => {
+      const ship = board.placeShip(3, 0, 0);
+      board.receiveAttack(0, 0);
+      board.receiveAttack(0, 0); // repeat attack
+      expect(ship.hitsTaken).toBe(1); // still only 1, not 2
+    });
+
+    test('should correctly distinguish between different coordinates on larger boards', () => {
+      const largeBoard = new Gameboard(12);
+      expect(largeBoard.receiveAttack(1, 11)).toBe(true);
+      expect(largeBoard.receiveAttack(11, 1)).toBe(true); // should not collide with above
+    });
+  });
+
+  describe('allShipsSunk()', () => {
+    test('should return true when no ships have been placed', () => {
+      expect(board.allShipsSunk()).toBe(true);
+    });
+
+    test('should return false when ships are placed but not hit', () => {
+      board.placeShip(3, 0, 0);
+      expect(board.allShipsSunk()).toBe(false);
+    });
+
+    test('should return false when some ships are sunk but not all', () => {
+      board.placeShip(1, 0, 0); // sinks in 1 hit
+      board.placeShip(2, 5, 5); // needs 2 hits
+      board.receiveAttack(0, 0); // sinks first ship
+      expect(board.allShipsSunk()).toBe(false);
+    });
+
+    test('should return true when all ships are sunk', () => {
+      board.placeShip(1, 0, 0);
+      board.placeShip(1, 5, 5);
+      board.receiveAttack(0, 0);
+      board.receiveAttack(5, 5);
+      expect(board.allShipsSunk()).toBe(true);
+    });
+  });
+
 });
+
