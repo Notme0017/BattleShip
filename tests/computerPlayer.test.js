@@ -34,7 +34,7 @@ describe('ComputerPlayer', () => {
 
     test('should return true or false (a valid attack() result)', () => {
       const result = computerPlayer.randomAttack(opponentBoard);
-      expect(typeof result).toBe('boolean');
+      expect(typeof result).toBe('object');
     });
 
     test('should never attack the same coordinate twice across all possible attacks', () => {

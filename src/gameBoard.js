@@ -28,16 +28,15 @@ export class Gameboard{
             this.board[r][c] = ship;
         }
 
-        return ship;
     }
 
-    receiveAttack(row, column){
-        if(row >= this.boardSize || column >= this.boardSize)throw new Error('Invalid attack position');
-        const attackedCoordinates = `${row}-${column}`;
+    receiveAttack(row, col){
+        if(row >= this.boardSize || col >= this.boardSize)throw new Error('Invalid attack position');
+        const attackedCoordinates = `${row}-${col}`;
         if(this.attacks.has(attackedCoordinates)) return 'already-attacked';
         this.attacks.add(attackedCoordinates);
-        if(this.board[row][column] instanceof Ship){
-            this.board[row][column].hit();
+        if(this.containsShip(row, col)){
+            this.board[row][col].hit();
             return 'hit';
         }
         return 'miss';
@@ -45,5 +44,16 @@ export class Gameboard{
 
     allShipsSunk(){
         return this.ships.every(ship => ship.isSunk())
+    }
+    
+    containsShip(row, col){
+        if(row >= this.boardSize || col >= this.boardSize)throw new Error('Invalid position');
+        return this.board[row][col] instanceof Ship;
+    }
+
+    hasBeenAttacked(row, col){
+        if(row >= this.boardSize || col >= this.boardSize)throw new Error('Invalid position');
+        const attackedCoordinates = `${row}-${col}`;
+        return this.attacks.has(attackedCoordinates);
     }
 }

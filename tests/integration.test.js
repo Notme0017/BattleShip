@@ -32,9 +32,9 @@ describe('Full game simulation', () => {
 
         let attackResult;
         if (player1Turn) {
-            attackResult = player1.randomAttack(board2);
+            attackResult = player1.randomAttack(board2).keepTurn;
         } else {
-            attackResult = player2.randomAttack(board1);
+            attackResult = player2.randomAttack(board1).keepTurn;
         }
 
         if (attackResult === false) {

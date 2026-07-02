@@ -32,6 +32,7 @@ export class ComputerPlayer extends Player{
 
         this.untriedPositions.pop();
 
-        return this.attack(opponentBoard, row, col);
+        const result = this.attack(opponentBoard, row, col);
+        return {...result, row, col};
     }
 }

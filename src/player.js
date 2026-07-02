@@ -6,12 +6,10 @@ export class Player{
     }
 
     attack(opponentBoard, row, column){
-        //false when need to change turn
-        //true keeping the turn
         if(!(opponentBoard instanceof Gameboard)) throw new Error('Gameboard not provided');
         const value = opponentBoard.receiveAttack(row, column);
-        if(value === 'already-attacked') return true;
-        else if(value === 'hit') return true;
-        else return false;
+        if(value === 'already-attacked') return {keepTurn: true, result: "already-attacked"};
+        else if(value === 'hit') return {keepTurn: true, result: "hit"};
+        else return {keepTurn: false, result: "miss"};
     }
 }
