@@ -6,12 +6,22 @@
     <title>Document</title>
 </head>
 <body>
+    <div id="mode-selection">
+        <h1>BattleShip</h1>
+        <button id="vs-computer">Play vs Computer</button>
+        <button id="vs-player">Play vs Player</button>
+    </div>
     <dialog id="win-dialog">
         <p id="win-text">
         </p>
         <button id="play-again">Play Again</button>
     </dialog>
-    <div id="game-container">
+
+    <dialog id="pass-screen">
+        <p id="pass-text"></p>
+        <button id="ready-btn">Ready</button>
+    </dialog>
+    <div id="game-container" style="display: none;">
         <div id="player-board">
             <h2>Your Board</h2>
             <div id="player-grid"></div>
@@ -20,8 +30,15 @@
             <h2>Opponent Board</h2>
             <div id="opponent-grid"></div>
         </div>
+        <div id="placement-panel" style="display: none">
+            <h3>Place your ships</h3>
+            <ul id="ship-list"></ul>
+            <button id="orientation-toggle">Change Vertical</button>
+            <button id="undo-btn" disabled>Undo</button>
+            <button id="done-btn" disabled>Done</button>
+        </div>
     </div>
 
-    <div id="game-status"></div>
+    <div id="game-status" style="display: none;"></div>
 </body>
 </html>

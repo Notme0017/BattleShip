@@ -27,6 +27,29 @@ export class Gameboard{
             const r = isHorizontal? row : row + i;
             this.board[r][c] = ship;
         }
+    }
+
+    removeShip(length, row, col, isHorizontal = true){
+        if(length <= 0 ) throw new Error('Ship length must be greater than 0');
+        if(isHorizontal && col + length > this.boardSize) throw new Error('Selection out of bounds');
+        if(!isHorizontal && row + length > this.boardSize) throw new Error('Selection out of bounds');
+        if(!(this.board[row][col] instanceof Ship)) throw new Error("No ship to remove");
+        
+        for(let i = 0; i < length; i++){
+            const c = isHorizontal? col + i: col;
+            const r = isHorizontal? row : row + i;
+            if(this.board[r][c] !== this.board[row][col]) throw new Error('Length or orientation is wrong');
+        }
+        
+        this.ships = this.ships.filter(ship => {
+            return ship !== this.board[row][col];
+        });
+
+        for(let i = 0; i <length; i++){
+            const c = isHorizontal? col + i: col;
+            const r = isHorizontal? row: row + i;
+            this.board[r][c] = null;
+        }
 
     }
 

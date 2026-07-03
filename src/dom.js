@@ -60,6 +60,7 @@ export function statusUpdate(message, player = "Player 1"){
     if(message === 'already-attacked') text = `${player} - You have already attacked the position.`;
     if(message === 'hit') text = `${player} - Yay! A successful hit. You can go again.`;
     if(message === 'miss') text = `${player} - You missed.`;
+    if(message === 'placed-ship')text = `Player - You are placing the ship at invalid postion.`;
 
     clearTimeout(statusTimeout);
 

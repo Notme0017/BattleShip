@@ -94,6 +94,33 @@ describe('Gameboard', () => {
     });
   });
 
+  describe('removeShip()', () =>{
+    test('should throw if length is less than or equal to 0', () =>{
+      board.placeShip(5, 0, 0, true);
+      expect(() => board.removeShip(0, 0, 0, true)).toThrow();
+    });
+
+    test('should throw if selection is out of bound', () =>{
+      board.placeShip(5, 0, 5, true);
+      expect(() => board.removeShip(6, 0, 5, true)).toThrow('Selection out of bounds');
+    });
+
+    test('should throw if orientation or length is wrong', () =>{
+      board.placeShip(3, 0, 0);
+      expect(() => board.removeShip(4, 0, 0, false)).toThrow('Length or orientation is wrong');
+    });
+
+    test('should remove ship', () =>{
+      board.placeShip(3, 0, 0, true);
+      expect(board.board[0][0]).toBeInstanceOf(Ship);
+      board.removeShip(3, 0, 0, true);
+      expect(board.board[0][0]).toBeNull();
+      expect(board.board[0][1]).toBeNull();
+      expect(board.board[0][2]).toBeNull();
+    });
+    
+  })
+
   describe('receiveAttack()', () => {
     test('should throw if row is out of bounds', () => {
       expect(() => board.receiveAttack(10, 5)).toThrow('Invalid attack position');
