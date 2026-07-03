@@ -8,7 +8,7 @@ import { placementPhase } from "./placement.js";
 export function game(isTwoPlayer = false){
     const boardSize = 10;
     let player1Turn = true;
-    let hasGameEnded = false;
+    let computerThinking = false;
     let currentHandler = null;
 
     const defaultFleet = [4, 3, 2, 1];
@@ -68,26 +68,22 @@ export function game(isTwoPlayer = false){
 
     function gameLoop(row, col){
         if(!isTwoPlayer){
+            if(computerThinking) return;
             const playerAttackedData = player.attack(opponentGameBoard, row, col);
-            console.log(playerAttackedData);
-            console.log(opponentGameBoard.ships.length);
             dom.updateCell(opponentGameBoard, opponentGrid, row, col);
-            dom.statusUpdate(playerAttackedData.result, "Player");
+            if(playerAttackedData.result === 'hit'){
+                const hitShip = opponentGameBoard.board[row][col];
+                if(hitShip.isSunk()) dom.statusUpdate('sunk', 'Player');
+                else dom.statusUpdate('hit', 'Player');
+            }else dom.statusUpdate(playerAttackedData.result, "Player");
+
             if(opponentGameBoard.allShipsSunk()){
                 dom.showWinDialog("Player");
                 return;
             }
             if(!playerAttackedData.keepTurn){
-                while(true){
-                    const computerAttackedData = opponent.randomAttack(playerGameBoard);
-                    dom.updateCell(playerGameBoard, playerGrid, computerAttackedData.row, computerAttackedData.col);
-                    dom.statusUpdate(computerAttackedData.result, "Computer");
-                    if(playerGameBoard.allShipsSunk()) {
-                        dom.showWinDialog("Computer");
-                        return;
-                    }
-                    if(!computerAttackedData.keepTurn)break;
-                }
+                computerThinking = true;
+                setTimeout(computerTurn, 500);
             }
         }
         else{
@@ -101,7 +97,13 @@ export function game(isTwoPlayer = false){
 
             const attackedData = currentAttacker.attack(attackedBoard, row, col);
             dom.updateCell(attackedBoard, attackedGrid, row, col);
-            dom.statusUpdate(attackedData.result, attackerName);
+            if(attackedData.result === 'hit'){
+                const hitShip = opponentGameBoard.board[row][col];
+                if(hitShip.isSunk()) dom.statusUpdate('sunk', attackerName);
+                else dom.statusUpdate('hit', attackerName);
+            }else{
+                dom.statusUpdate(attackedData.result, attackerName);
+            }
 
             if(attackedBoard.allShipsSunk()){
                 dom.showWinDialog(attackerName);
@@ -119,19 +121,36 @@ export function game(isTwoPlayer = false){
     }
 
     function showPassScreen(message, onReady){
-    const passScreen = document.getElementById('pass-screen');
-    const passText = document.getElementById('pass-text');
-    const readyBtn = document.getElementById('ready-btn');
+        const passScreen = document.getElementById('pass-screen');
+        const passText = document.getElementById('pass-text');
+        const readyBtn = document.getElementById('ready-btn');
 
-    if(!passScreen) throw new Error('No pass screen available');
-    if(!passText) throw new Error(' No pass text avaialable');
-    if(!readyBtn) throw new Error('No ready button found');
+        if(!passScreen) throw new Error('No pass screen available');
+        if(!passText) throw new Error(' No pass text avaialable');
+        if(!readyBtn) throw new Error('No ready button found');
 
-    passText.textContent = message;
-    passScreen.showModal();
-    readyBtn.addEventListener('click', () =>{
-        passScreen.close();
-        onReady();
-    }, {once: true});
-}
+        passText.textContent = message;
+        passScreen.showModal();
+        readyBtn.addEventListener('click', () =>{
+            passScreen.close();
+            onReady();
+        }, {once: true});
+    };
+
+    function computerTurn(){
+        computerThinking = true;
+        const computerAttackedData = opponent.randomAttack(playerGameBoard);
+        dom.updateCell(playerGameBoard, playerGrid, computerAttackedData.row, computerAttackedData.col);
+        dom.statusUpdate(computerAttackedData.result, "Computer");
+        if(playerGameBoard.allShipsSunk()) {
+            dom.showWinDialog("Computer");
+            computerThinking = false;
+            return;
+        }
+        if(computerAttackedData.keepTurn) setTimeout(computerTurn, 500);
+        else {
+            computerThinking = false;
+            return;
+        }
+    }
 }

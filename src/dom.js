@@ -57,9 +57,10 @@ export function statusUpdate(message, player = "Player 1"){
     const statusUI = document.getElementById('game-status');
     if(!statusUI) throw new Error('Game Status element not found');
     let text = "";
-    if(message === 'already-attacked') text = `${player} - You have already attacked the position.`;
-    if(message === 'hit') text = `${player} - Yay! A successful hit. You can go again.`;
-    if(message === 'miss') text = `${player} - You missed.`;
+    if(message === 'already-attacked') text = `${player} - have already attacked the position.`;
+    if(message === 'hit') text = `${player} - Yay! A successful hit. ${player} can go again.`;
+    if(message === 'miss') text = `${player} - missed.`;
+    if(message === 'sunk') text = `${player} - Sunk a ship`;
     if(message === 'placed-ship')text = `Player - You are placing the ship at invalid postion.`;
 
     clearTimeout(statusTimeout);
