@@ -1,4 +1,5 @@
 import { Player } from "./player.js";
+import { Gameboard } from "./gameBoard.js";
 
 export class ComputerPlayer extends Player{
     constructor(playerBoard){
@@ -11,28 +12,54 @@ export class ComputerPlayer extends Player{
             }
         }
 
+        this.priorityTargets = [];
     }
 
     randomAttack(opponentBoard){
-        const min = 0;
-        const max = this.untriedPositions.length;
-        const lastPostion = this.untriedPositions.length - 1;
+        if(this.untriedPositions.length === 0 && this.priorityTargets.length === 0) throw new Error('No positions left to attack');
 
-        if(max <= min) throw new Error('No more untried positions left');
-        const rngValue = Math.floor(Math.random() * (max - min)+ min);
+        let row, col;
 
-        const attackingPosition = this.untriedPositions[rngValue];
+        if(this.priorityTargets.length > 0){
+            [row, col] = this.priorityTargets.shift();
 
-        const row = attackingPosition[0];
-        const col = attackingPosition[1];
-
-        if(!(rngValue === lastPostion)){
-            [this.untriedPositions[rngValue], this.untriedPositions[lastPostion]] = [this.untriedPositions[lastPostion], this.untriedPositions[rngValue]]
+            const key = `${row}-${col}`;
+            const indexInUntried = this.untriedPositions.findIndex(
+                pos => `${pos[0]}-${pos[1]}` === key
+            );
+            if(indexInUntried !== - 1) this.untriedPositions.splice(indexInUntried, 1);
+        }else{
+            const rngIndex = Math.floor(Math.random() * this.untriedPositions.length);
+            [row, col] = this.untriedPositions[rngIndex];
+            [this.untriedPositions[rngIndex], this.untriedPositions[this.untriedPositions.length - 1]] = [this.untriedPositions[this.untriedPositions.length - 1], this.untriedPositions[rngIndex]];
+            this.untriedPositions.pop();
         }
 
-        this.untriedPositions.pop();
-
         const result = this.attack(opponentBoard, row, col);
+
+        if(result.result === 'hit'){
+            const hitShip = opponentBoard.board[row][col];
+            if(hitShip.isSunk()){
+                this.priorityTargets = [];
+            }else{
+                const neighbours = [
+                    [row - 1, col],
+                    [row + 1, col],
+                    [row, col + 1],
+                    [row, col - 1]
+                ];
+                neighbours.forEach(([r, c]) => {
+                    if(r < 0 || r >= opponentBoard.boardSize) return;
+                    if(c < 0 || c >= opponentBoard.boardSize) return;
+                    if(opponentBoard.hasBeenAttacked(r, c))return;
+                    const key = `${r}-${c}`;
+                    const alreadyTargeted = this.priorityTargets.some(
+                        pos => `${pos[0]}-${pos[1]}` === key
+                    );
+                    if(!alreadyTargeted) this.priorityTargets.unshift([r, c]);
+                });
+            }
+        }
         return {...result, row, col};
     }
 }

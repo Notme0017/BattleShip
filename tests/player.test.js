@@ -1,5 +1,6 @@
 import {Player} from '../src/player.js';
 import { Gameboard } from '../src/gameBoard.js';
+import { Ship } from '../src/ship.js';
 
 describe('Player', () => {
 

@@ -27,6 +27,7 @@ export class Gameboard{
             const r = isHorizontal? row : row + i;
             this.board[r][c] = ship;
         }
+        return ship;
     }
 
     removeShip(length, row, col, isHorizontal = true){

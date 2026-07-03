@@ -98,7 +98,7 @@ export function game(isTwoPlayer = false){
             const attackedData = currentAttacker.attack(attackedBoard, row, col);
             dom.updateCell(attackedBoard, attackedGrid, row, col);
             if(attackedData.result === 'hit'){
-                const hitShip = opponentGameBoard.board[row][col];
+                const hitShip = attackedBoard.board[row][col];
                 if(hitShip.isSunk()) dom.statusUpdate('sunk', attackerName);
                 else dom.statusUpdate('hit', attackerName);
             }else{
